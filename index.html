@@ -435,7 +435,7 @@ footer a{color:var(--bone);text-decoration:none}
     </div>
 
     <!-- stage callouts: data-a/data-b = progress window -->
-    <div class="callout co-left"  data-a="0.03" data-b="0.15">
+    <div class="callout co-left"  data-a="0.08" data-b="0.17">
       <div class="no">Stage 01</div><h3>Full damage assessment</h3>
       <p>Laser measuring on the frame bench. Every millimeter of deviation documented before a single tool touches the car.</p>
     </div>
@@ -970,7 +970,7 @@ function step(now){
   (framesReady ? drawPhotoFrame : drawFrame)(shown, t);
 
   railFill.style.height = Math.round(shown*100) + '%';
-  brandmark.style.opacity = 1 - st(shown, 0.02, 0.06);   // gone as the first stage caption arrives (~3-6%)
+  brandmark.style.opacity = 1 - st(shown, 0.0, 0.05);   // fully gone before the first caption appears (clean hand-off)
 
   callouts.forEach(c=>{
     const a = +c.dataset.a, b = +c.dataset.b;
