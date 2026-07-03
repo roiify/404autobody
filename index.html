@@ -84,16 +84,22 @@ body.nav-open .burger span:nth-child(3){transform:translateY(-9px) rotate(-45deg
 body.nav-open .nav-backdrop{pointer-events:auto}
 /* compact dropdown that rolls DOWN from under the action bar */
 .nav-drawer{position:fixed;top:52px;left:0;right:0;z-index:44;
-  display:flex;align-items:center;padding:9px clamp(14px,4vw,40px);
+  display:flex;align-items:center;padding:9px clamp(14px,4vw,40px);max-height:calc(100vh - 52px);overflow-y:auto;
   background:rgba(11,11,13,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-bottom:1px solid rgba(224,38,31,.45);box-shadow:0 22px 44px rgba(0,0,0,.55);
   transform:translateY(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1)}
 body.nav-open .nav-drawer{transform:translateY(0)}
 .nd-head{display:none}
-/* single line — scrolls horizontally if it can't all fit */
+/* single line on desktop — scrolls horizontally if it can't all fit */
 .nav-drawer nav{display:flex;flex-wrap:nowrap;align-items:center;gap:1px;
   flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .nav-drawer nav::-webkit-scrollbar{display:none}
+/* mobile: wrap into a normal stacked menu instead of a hidden side-scroll */
+@media (max-width:640px){
+  .nav-drawer nav{flex-wrap:wrap;overflow-x:visible;gap:2px}
+  .nav-drawer .nd-group{flex-basis:100%;border-left:0;margin-left:0;padding:12px 4px 3px}
+  .nav-drawer .nd-link{padding:9px 8px;font-size:12px}
+}
 .nd-link{flex:0 0 auto;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;
   color:var(--bone);text-decoration:none;padding:7px 10px;border-radius:2px;white-space:nowrap;transition:background .15s ease, color .15s ease}
 .nd-link:hover{background:rgba(224,38,31,.16);color:#fff}
@@ -120,7 +126,8 @@ body.nav-open .nav-drawer{transform:translateY(0)}
 .tb-call:hover{filter:brightness(1.08)}
 .tb-est:focus-visible,.tb-call:focus-visible,.tb-brand:focus-visible{outline:2px solid var(--bone);outline-offset:3px}
 @media (max-width:820px){ .tb-mid{display:none} }
-@media (max-width:560px){ .tb-brand{font-size:11px} .tb-est{display:none} .tb-call{padding:8px 12px;font-size:12px} }
+@media (max-width:640px){ .tb-name{display:none} }   /* keep just "404" so the phone always fits */
+@media (max-width:560px){ .tb-est{display:none} .tb-call{padding:8px 12px;font-size:12px} }
 
 /* brand wordmark overlay (fades out via JS as scroll progresses) */
 .brandmark{position:absolute;top:clamp(78px,12vh,140px);left:0;right:0;text-align:center;
@@ -268,6 +275,7 @@ footer a{color:var(--bone);text-decoration:none}
   .hud-tl{max-width:38vw}
   .hud-pct{font-size:44px}
   .outro-head-row{flex-direction:column;align-items:flex-start}
+  .outro-copy,.outro-head h2{flex:0 0 auto}   /* drop desktop 380px basis so no giant gap on mobile */
   .glitch404{width:100%;max-width:440px}
   .services{grid-template-columns:1fr}
   .svc{border-right:0;border-bottom:1px solid #26262c}
@@ -362,7 +370,7 @@ footer a{color:var(--bone);text-decoration:none}
     <button class="burger" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
       <span></span><span></span><span></span>
     </button>
-    <a class="tb-brand" href="#top" aria-label="404 Auto Body Collision"><span class="tb-404">404</span>&nbsp;Auto Body Collision</a>
+    <a class="tb-brand" href="#top" aria-label="404 Auto Body Collision"><span class="tb-404">404</span><span class="tb-name">&nbsp;Auto Body Collision</span></a>
   </div>
   <div class="tb-mid">Collision Repair · Westchester County, NY · Free Estimates</div>
   <div class="tb-right"><a class="tb-est" href="estimate.html">Free Estimate</a><a class="tb-call" href="tel:+19140000000"><span class="tb-ico" aria-hidden="true">&#9742;</span> (914)&nbsp;000-0000</a></div>
@@ -901,10 +909,14 @@ function drawPhotoFrame(p, t){
   const i = Math.floor(seg);
   const f = st(seg - i, 0, 1);           // eased blend into next stage
 
-  // cover-fit with a slow pull-back as the car gets repaired (1.07 → 1.0)
+  // slow pull-back as the car gets repaired (1.07 → 1.0)
   const zoom = 1.07 - .07 * p;
   const iw = keyframes[0].naturalWidth, ih = keyframes[0].naturalHeight;
-  const s = Math.max(W/iw, H/ih) * zoom;
+  // portrait/narrow screens: fit to WIDTH so the whole car shows (cover-fit
+  // would zoom into the middle of the 16:9 photo on a tall phone).
+  const portrait = H > W;
+  const base = portrait ? (W/iw) : Math.max(W/iw, H/ih);
+  const s = base * zoom;
   const dw = iw*s, dh = ih*s, dx = (W-dw)/2, dy = (H-dh)/2;
   const IX = (x,y)=>[dx + x*dw, dy + y*dh]; // image-relative → screen coords
 
