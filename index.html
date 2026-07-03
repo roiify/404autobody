@@ -915,7 +915,7 @@ function drawPhotoFrame(p, t){
   // portrait/narrow screens: fill more of the height so the car reads big,
   // clamped so it never zooms past cover-fit (which would over-crop the sides).
   const portrait = H > W;
-  const PORTRAIT_FILL = 1.9;   // >1 = bigger car, trims a little off front/back
+  const PORTRAIT_FILL = 1.3;   // >1 = bigger car, but too high clips the front/back
   const base = portrait ? Math.min((W/iw) * PORTRAIT_FILL, Math.max(W/iw, H/ih)) : Math.max(W/iw, H/ih);
   const s = base * zoom;
   const dw = iw*s, dh = ih*s, dx = (W-dw)/2, dy = (H-dh)/2;
