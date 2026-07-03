@@ -912,10 +912,11 @@ function drawPhotoFrame(p, t){
   // slow pull-back as the car gets repaired (1.07 → 1.0)
   const zoom = 1.07 - .07 * p;
   const iw = keyframes[0].naturalWidth, ih = keyframes[0].naturalHeight;
-  // portrait/narrow screens: fit to WIDTH so the whole car shows (cover-fit
-  // would zoom into the middle of the 16:9 photo on a tall phone).
+  // portrait/narrow screens: fill more of the height so the car reads big,
+  // clamped so it never zooms past cover-fit (which would over-crop the sides).
   const portrait = H > W;
-  const base = portrait ? (W/iw) : Math.max(W/iw, H/ih);
+  const PORTRAIT_FILL = 1.9;   // >1 = bigger car, trims a little off front/back
+  const base = portrait ? Math.min((W/iw) * PORTRAIT_FILL, Math.max(W/iw, H/ih)) : Math.max(W/iw, H/ih);
   const s = base * zoom;
   const dw = iw*s, dh = ih*s, dx = (W-dw)/2, dy = (H-dh)/2;
   const IX = (x,y)=>[dx + x*dw, dy + y*dh]; // image-relative → screen coords
