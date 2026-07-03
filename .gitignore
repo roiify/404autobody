@@ -1,0 +1,4 @@
+frames-src/
+.claude/
+.DS_Store
+*.log
